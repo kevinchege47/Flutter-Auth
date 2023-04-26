@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterauth/components/square_tile.dart';
 import '../components/my_button.dart';
@@ -8,7 +10,13 @@ class LoginPage extends StatelessWidget {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  void signUserIn() {}
+  void signUserIn() async {
+    if (kDebugMode) {
+      print("Clicked");
+    }
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text, password: passwordController.text);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +126,7 @@ class LoginPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Text("Not A member?"),
-                    Text("Register",style:TextStyle(
+                    Text("Register", style: TextStyle(
                       color: Colors.blue,
                     ),)
                   ],
