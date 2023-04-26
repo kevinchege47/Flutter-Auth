@@ -5,18 +5,50 @@ import 'package:flutterauth/components/square_tile.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({Key? key}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
+
   final passwordController = TextEditingController();
 
   void signUserIn() async {
-    if (kDebugMode) {
-      print("Clicked");
+    //show loading circle
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        });
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: emailController.text, password: passwordController.text);
     }
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text, password: passwordController.text);
+    on FirebaseAuthException catch (e) {
+    Navigator.pop(context);
+    if (e.code == 'user-not-found') {
+      //  show error to user
+        wrongEmailMessage();
+      } else if (e.code == 'Wrong Password') {
+      //  show error to user
+        wrongEmailMessage();
+      }
+    } //  pop loading circle
+    Navigator.pop(context);
+
   }
+  void wrongEmailMessage(){
+    showDialog(context: context, builder: (context){
+      return const AlertDialog(title: Text("Incorrect Credentials"),);
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -126,9 +158,12 @@ class LoginPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Text("Not A member?"),
-                    Text("Register", style: TextStyle(
-                      color: Colors.blue,
-                    ),)
+                    Text(
+                      "Register",
+                      style: TextStyle(
+                        color: Colors.blue,
+                      ),
+                    )
                   ],
                 )
               ],
